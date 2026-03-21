@@ -275,8 +275,8 @@ public class SecurityConfig {
   public org.springframework.security.authentication.dao.DaoAuthenticationProvider authenticationProvider(
       final com.iam.server.rbac.service.UserAuthService userAuthService,
       final PasswordEncoder passwordEncoder) {
-    org.springframework.security.authentication.dao.DaoAuthenticationProvider provider = new org.springframework.security.authentication.dao.DaoAuthenticationProvider();
-    provider.setUserDetailsService(userAuthService);
+    org.springframework.security.authentication.dao.DaoAuthenticationProvider provider =
+        new org.springframework.security.authentication.dao.DaoAuthenticationProvider(userAuthService);
     provider.setPasswordEncoder(passwordEncoder);
     return provider;
   }

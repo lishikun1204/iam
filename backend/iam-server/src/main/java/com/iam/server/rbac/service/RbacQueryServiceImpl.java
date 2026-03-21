@@ -41,4 +41,3 @@ public class RbacQueryServiceImpl implements RbacQueryService {
     return codes;
   }
 }
-

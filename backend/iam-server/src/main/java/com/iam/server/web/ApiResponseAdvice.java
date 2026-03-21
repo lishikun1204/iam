@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
@@ -29,7 +31,8 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
    * @param converterType 将用于写入响应体的消息转换器类型
    * @return 如果需要应用此advice则返回true，否则返回false
    */
-  public boolean supports(final MethodParameter returnType, final Class<? extends HttpMessageConverter<?>> converterType) {
+  public boolean supports(@NonNull final MethodParameter returnType,
+                          @NonNull final Class<? extends HttpMessageConverter<?>> converterType) {
     String className = returnType.getContainingClass().getName();
     return className.startsWith("com.iam.server.api");
   }
@@ -48,12 +51,12 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
    * @param response 当前HTTP响应
    * @return 经过处理后的响应体对象
    */
-  public Object beforeBodyWrite(final Object body,
-                                final MethodParameter returnType,
-                                final MediaType selectedContentType,
-                                final Class<? extends HttpMessageConverter<?>> selectedConverterType,
-                                final ServerHttpRequest request,
-                                final ServerHttpResponse response) {
+  public Object beforeBodyWrite(@Nullable final Object body,
+                                @NonNull final MethodParameter returnType,
+                                @NonNull final MediaType selectedContentType,
+                                @NonNull final Class<? extends HttpMessageConverter<?>> selectedConverterType,
+                                @NonNull final ServerHttpRequest request,
+                                @NonNull final ServerHttpResponse response) {
     if (body instanceof ApiResponse) {
       return body;
     }

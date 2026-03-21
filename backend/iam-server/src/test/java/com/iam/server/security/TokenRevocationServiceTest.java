@@ -12,10 +12,12 @@ class TokenRevocationServiceTest {
   @Test
   void revokeJti_shouldWriteKeyWithTtl() {
     StringRedisTemplate redis = Mockito.mock(StringRedisTemplate.class);
-    ValueOperations<String, String> ops = Mockito.mock(ValueOperations.class);
+    @SuppressWarnings("unchecked")
+    ValueOperations<String, String> ops = (ValueOperations<String, String>) Mockito.mock(ValueOperations.class);
     Mockito.when(redis.opsForValue()).thenReturn(ops);
 
-    ObjectProvider<StringRedisTemplate> provider = Mockito.mock(ObjectProvider.class);
+    @SuppressWarnings("unchecked")
+    ObjectProvider<StringRedisTemplate> provider = (ObjectProvider<StringRedisTemplate>) Mockito.mock(ObjectProvider.class);
     Mockito.when(provider.getIfAvailable()).thenReturn(redis);
 
     TokenRevocationService service = new TokenRevocationService(provider, true);
@@ -26,7 +28,8 @@ class TokenRevocationServiceTest {
 
   @Test
   void isRevoked_shouldReturnFalseOnBlank() {
-    ObjectProvider<StringRedisTemplate> provider = Mockito.mock(ObjectProvider.class);
+    @SuppressWarnings("unchecked")
+    ObjectProvider<StringRedisTemplate> provider = (ObjectProvider<StringRedisTemplate>) Mockito.mock(ObjectProvider.class);
     TokenRevocationService service = new TokenRevocationService(provider, true);
     Assertions.assertFalse(service.isRevoked(""));
   }
@@ -34,11 +37,13 @@ class TokenRevocationServiceTest {
   @Test
   void isRevoked_shouldReturnTrueWhenKeyExists() {
     StringRedisTemplate redis = Mockito.mock(StringRedisTemplate.class);
-    ValueOperations<String, String> ops = Mockito.mock(ValueOperations.class);
+    @SuppressWarnings("unchecked")
+    ValueOperations<String, String> ops = (ValueOperations<String, String>) Mockito.mock(ValueOperations.class);
     Mockito.when(redis.opsForValue()).thenReturn(ops);
     Mockito.when(ops.get("iam:token:revoked:jti-1")).thenReturn("1");
 
-    ObjectProvider<StringRedisTemplate> provider = Mockito.mock(ObjectProvider.class);
+    @SuppressWarnings("unchecked")
+    ObjectProvider<StringRedisTemplate> provider = (ObjectProvider<StringRedisTemplate>) Mockito.mock(ObjectProvider.class);
     Mockito.when(provider.getIfAvailable()).thenReturn(redis);
 
     TokenRevocationService service = new TokenRevocationService(provider, true);
@@ -48,10 +53,12 @@ class TokenRevocationServiceTest {
   @Test
   void revokeJti_shouldUseFallbackTtlWhenExpired() {
     StringRedisTemplate redis = Mockito.mock(StringRedisTemplate.class);
-    ValueOperations<String, String> ops = Mockito.mock(ValueOperations.class);
+    @SuppressWarnings("unchecked")
+    ValueOperations<String, String> ops = (ValueOperations<String, String>) Mockito.mock(ValueOperations.class);
     Mockito.when(redis.opsForValue()).thenReturn(ops);
 
-    ObjectProvider<StringRedisTemplate> provider = Mockito.mock(ObjectProvider.class);
+    @SuppressWarnings("unchecked")
+    ObjectProvider<StringRedisTemplate> provider = (ObjectProvider<StringRedisTemplate>) Mockito.mock(ObjectProvider.class);
     Mockito.when(provider.getIfAvailable()).thenReturn(redis);
 
     TokenRevocationService service = new TokenRevocationService(provider, true);
@@ -61,7 +68,8 @@ class TokenRevocationServiceTest {
 
   @Test
   void noRedisMode_shouldUseInMemoryStore() {
-    ObjectProvider<StringRedisTemplate> provider = Mockito.mock(ObjectProvider.class);
+    @SuppressWarnings("unchecked")
+    ObjectProvider<StringRedisTemplate> provider = (ObjectProvider<StringRedisTemplate>) Mockito.mock(ObjectProvider.class);
     Mockito.when(provider.getIfAvailable()).thenReturn(null);
 
     TokenRevocationService service = new TokenRevocationService(provider, false);

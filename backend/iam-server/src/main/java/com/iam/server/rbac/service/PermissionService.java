@@ -28,12 +28,13 @@ public class PermissionService {
 
   @Cacheable(cacheNames = "rbac:permission", key = "#id")
   public PermissionDto get(final String id) {
-    Permission p = permissionRepository.findById(id).orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND, "权限不存在"));
+    Permission p = permissionRepository.findById(id)
+        .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND, "权限不存在"));
     return toDto(p);
   }
 
   @Transactional
-  @CacheEvict(cacheNames = {"rbac:permission", "rbac:userAuthorities"}, allEntries = true)
+  @CacheEvict(cacheNames = { "rbac:permission", "rbac:userAuthorities" }, allEntries = true)
   public PermissionDto create(final CreatePermissionRequest req) {
     if (permissionRepository.existsByCode(req.getCode())) {
       throw new ApiException(ApiErrorCode.CONFLICT, "权限编码已存在");
@@ -52,9 +53,10 @@ public class PermissionService {
 
   @Transactional
   @CachePut(cacheNames = "rbac:permission", key = "#id")
-  @CacheEvict(cacheNames = {"rbac:userAuthorities"}, allEntries = true)
+  @CacheEvict(cacheNames = { "rbac:userAuthorities" }, allEntries = true)
   public PermissionDto update(final String id, final UpdatePermissionRequest req) {
-    Permission p = permissionRepository.findById(id).orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND, "权限不存在"));
+    Permission p = permissionRepository.findById(id)
+        .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND, "权限不存在"));
     p.setName(req.getName());
     p.setType(req.getType());
     p.setUrl(req.getUrl());
@@ -79,4 +81,3 @@ public class PermissionService {
     return dto;
   }
 }
-
