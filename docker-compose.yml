@@ -1,0 +1,8 @@
+services:
+  redis:
+    image: redis:7.4
+    container_name: iam-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "no"]
+

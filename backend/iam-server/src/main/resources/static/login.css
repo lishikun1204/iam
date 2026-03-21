@@ -1,0 +1,167 @@
+:root {
+  color-scheme: light;
+  --bg-1: #f8fafc;
+  --bg-2: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: rgba(148, 163, 184, 0.38);
+  --shadow: 0 24px 70px -40px rgba(2, 8, 23, 0.55);
+  --accent: #0284c7;
+  --accent-2: #4f46e5;
+  --danger: #e11d48;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
+    "Segoe UI Emoji";
+  color: var(--text);
+  background:
+    radial-gradient(900px 480px at 22% 18%, rgba(2, 132, 199, 0.16), transparent 55%),
+    radial-gradient(760px 520px at 76% 64%, rgba(79, 70, 229, 0.12), transparent 58%),
+    linear-gradient(140deg, var(--bg-1), var(--bg-2));
+}
+
+.iam-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+}
+
+.iam-card {
+  width: 100%;
+  max-width: 392px;
+  box-sizing: border-box;
+  padding: 28px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+.iam-brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.iam-brand__badge {
+  height: 42px;
+  width: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #0b4a6f;
+  background: rgba(2, 132, 199, 0.14);
+  border: 1px solid rgba(2, 132, 199, 0.22);
+}
+
+.iam-brand__title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.iam-brand__sub {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.iam-alert {
+  margin-top: 16px;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  background: rgba(248, 250, 252, 0.9);
+  color: var(--text);
+}
+
+.iam-alert--error {
+  border-color: rgba(225, 29, 72, 0.25);
+  background: rgba(225, 29, 72, 0.08);
+  color: #9f1239;
+}
+
+.iam-alert--info {
+  border-color: rgba(2, 132, 199, 0.25);
+  background: rgba(2, 132, 199, 0.08);
+  color: #0b4a6f;
+}
+
+.iam-form {
+  margin-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.iam-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.iam-input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: rgba(255, 255, 255, 0.92);
+  outline: none;
+  transition: box-shadow 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.iam-input:focus {
+  border-color: rgba(2, 132, 199, 0.65);
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.14);
+}
+
+.iam-button {
+  margin-top: 8px;
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 14px 30px -18px rgba(2, 132, 199, 0.65);
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.iam-button:hover {
+  filter: brightness(1.02);
+  transform: translateY(-1px);
+}
+
+.iam-button:active {
+  transform: translateY(0);
+}
+
+.iam-foot {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.iam-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  color: #334155;
+}
+

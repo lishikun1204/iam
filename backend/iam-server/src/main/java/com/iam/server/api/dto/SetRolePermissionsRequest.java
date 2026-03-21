@@ -1,0 +1,18 @@
+package com.iam.server.api.dto;
+
+import jakarta.validation.constraints.NotNull;
+import java.util.Set;
+
+public class SetRolePermissionsRequest {
+  @NotNull
+  private Set<String> permissionIds;
+
+  public Set<String> getPermissionIds() {
+    return permissionIds;
+  }
+
+  public void setPermissionIds(final Set<String> permissionIds) {
+    this.permissionIds = permissionIds;
+  }
+}
+
