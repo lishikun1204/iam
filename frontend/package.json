@@ -1,48 +1,117 @@
 {
-  "name": "frontend",
-  "private": true,
-  "version": "0.0.0",
+  "name": "soybean-admin",
+  "version": "2.1.0",
+  "description": "A fresh and elegant admin template, based on Vue3、Vite7、TypeScript、NaiveUI and UnoCSS. 一个基于Vue3、Vite7、TypeScript、NaiveUI and UnoCSS的清新优雅的中后台模版。",
+  "keywords": [
+    "TypeScript",
+    "UnoCSS",
+    "Vite7",
+    "Vue3 admin ",
+    "ant-design-vue v4",
+    "naive-ui",
+    "naive-ui-admin",
+    "vue-admin-template"
+  ],
+  "homepage": "https://github.com/soybeanjs/soybean-admin",
+  "bugs": {
+    "url": "https://github.com/soybeanjs/soybean-admin/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Soybean",
+    "email": "soybeanjs@outlook.com",
+    "url": "https://github.com/soybeanjs"
+  },
+  "repository": {
+    "url": "https://github.com/soybeanjs/soybean-admin.git"
+  },
   "type": "module",
   "scripts": {
+    "build": "vite build --mode prod",
+    "build:test": "vite build --mode test",
+    "cleanup": "sa cleanup",
+    "commit": "sa git-commit",
+    "commit:zh": "sa git-commit -l=zh-cn",
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "dev:prod": "vite --mode prod",
+    "fmt": "oxfmt",
+    "gen-route": "sa gen-route",
+    "lint": "oxlint --fix && eslint --fix .",
+    "prepare": "simple-git-hooks",
     "preview": "vite preview",
-    "check": "vue-tsc -b",
-    "lint": "eslint . --ext .ts,.vue",
-    "lint:fix": "eslint . --ext .ts,.vue --fix"
+    "release": "sa release",
+    "typecheck": "vue-tsc --noEmit --skipLibCheck",
+    "update-pkg": "sa update-pkg"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
-    "axios": "^1.7.9",
-    "element-plus": "^2.7.8",
-    "lucide-vue-next": "^0.511.0",
-    "pinia": "^2.1.7",
-    "tailwind-merge": "^3.3.0",
-    "vue": "^3.4.15",
-    "vue-router": "^4.2.5"
+    "@better-scroll/core": "2.5.1",
+    "@iconify/vue": "5.0.0",
+    "@sa/axios": "workspace:*",
+    "@sa/color": "workspace:*",
+    "@sa/hooks": "workspace:*",
+    "@sa/materials": "workspace:*",
+    "@sa/utils": "workspace:*",
+    "@vueuse/core": "14.2.1",
+    "clipboard": "2.0.11",
+    "dayjs": "1.11.19",
+    "defu": "6.1.4",
+    "echarts": "6.0.0",
+    "json5": "2.2.3",
+    "naive-ui": "2.44.1",
+    "nprogress": "0.2.0",
+    "pinia": "3.0.4",
+    "tailwind-merge": "3.5.0",
+    "vue": "3.5.29",
+    "vue-draggable-plus": "0.6.1",
+    "vue-i18n": "11.3.0",
+    "vue-router": "5.0.3"
   },
   "devDependencies": {
-    "@types/node": "^22.15.30",
-    "@typescript-eslint/eslint-plugin": "^7.0.1",
-    "@typescript-eslint/parser": "^7.0.1",
-    "@vitejs/plugin-vue": "^5.0.3",
-    "@vue/runtime-dom": "^3.4.15",
-    "@vue/tsconfig": "^0.7.0",
-    "autoprefixer": "^10.4.17",
-    "eslint": "^8.56.0",
-    "eslint-plugin-vue": "^9.20.1",
-    "postcss": "^8.4.35",
-    "tailwindcss": "^3.4.1",
-    "typescript": "~5.3.3",
-    "unplugin-vue-dev-locator": "^1.0.0",
-    "vite": "^5.0.12",
-    "vite-plugin-trae-solo-badge": "^1.0.0",
-    "vue-tsc": "^1.8.27"
+    "@elegant-router/vue": "0.3.8",
+    "@iconify/json": "2.2.447",
+    "@sa/scripts": "workspace:*",
+    "@sa/uno-preset": "workspace:*",
+    "@soybeanjs/eslint-config-vue": "^0.0.2",
+    "@types/node": "25.3.5",
+    "@types/nprogress": "0.2.3",
+    "@vitejs/plugin-vue": "6.0.4",
+    "@vitejs/plugin-vue-jsx": "5.1.4",
+    "consola": "3.4.2",
+    "eslint": "10.0.3",
+    "kolorist": "1.8.0",
+    "oxfmt": "^0.36.0",
+    "oxlint": "^1.51.0",
+    "sass": "1.97.3",
+    "simple-git-hooks": "2.13.1",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "unocss": "^66.6.6",
+    "unplugin-icons": "23.0.1",
+    "unplugin-vue-components": "31.0.0",
+    "vite": "7.3.1",
+    "vite-plugin-progress": "0.0.7",
+    "vite-plugin-svg-icons": "2.0.1",
+    "vite-plugin-vue-devtools": "8.0.7",
+    "vite-plugin-vue-transition-root-validator": "^0.1.0",
+    "vue-tsc": "3.2.5"
+  },
+  "simple-git-hooks": {
+    "commit-msg": "pnpm sa git-commit-verify",
+    "pre-commit": "pnpm typecheck && pnpm lint && pnpm fmt && git diff --exit-code"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@parcel/watcher",
       "esbuild",
+      "simple-git-hooks",
+      "unrs-resolver",
       "vue-demi"
     ]
-  }
+  },
+  "engines": {
+    "node": ">=20.19.0",
+    "pnpm": ">=10.5.0"
+  },
+  "website": "https://admin.soybeanjs.cn",
+  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
 }

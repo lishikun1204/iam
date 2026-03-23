@@ -5,6 +5,7 @@ import com.iam.server.api.dto.RoleDto;
 import com.iam.server.api.dto.SetRolePermissionsRequest;
 import com.iam.server.api.dto.UpdateRoleRequest;
 import com.iam.server.rbac.service.RoleService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoleController {
   private final RoleService roleService;
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Spring-managed bean injection")
   public RoleController(final RoleService roleService) {
     this.roleService = roleService;
   }
@@ -64,4 +66,3 @@ public class RoleController {
     roleService.setPermissions(id, req);
   }
 }
-

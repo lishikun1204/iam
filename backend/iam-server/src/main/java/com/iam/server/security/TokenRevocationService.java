@@ -35,7 +35,15 @@ public class TokenRevocationService {
       final ObjectProvider<StringRedisTemplate> redisProvider,
       @Value("${iam.redis.enabled:true}") final boolean redisEnabled) {
     this.redisEnabled = redisEnabled;
-    this.redis = redisProvider.getIfAvailable();
+    StringRedisTemplate redisTemplate = null;
+    if (redisEnabled) {
+      try {
+        redisTemplate = redisProvider.getIfAvailable();
+      } catch (RuntimeException ignored) {
+        redisTemplate = null;
+      }
+    }
+    this.redis = redisTemplate;
   }
 
     /**

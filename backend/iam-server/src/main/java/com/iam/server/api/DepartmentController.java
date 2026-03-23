@@ -4,6 +4,7 @@ import com.iam.server.api.dto.CreateDepartmentRequest;
 import com.iam.server.api.dto.DepartmentDto;
 import com.iam.server.api.dto.UpdateDepartmentRequest;
 import com.iam.server.rbac.service.DepartmentService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DepartmentController {
   private final DepartmentService departmentService;
 
+  @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Spring-managed bean injection")
   public DepartmentController(final DepartmentService departmentService) {
     this.departmentService = departmentService;
   }
@@ -55,4 +57,3 @@ public class DepartmentController {
     departmentService.delete(id);
   }
 }
-

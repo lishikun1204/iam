@@ -80,11 +80,11 @@ public class Role extends BaseEntity {
   }
 
   public Set<Permission> getPermissions() {
-    return permissions;
+    return permissions != null ? Set.copyOf(permissions) : Set.of();
   }
 
   public void setPermissions(final Set<Permission> permissions) {
-    this.permissions = permissions;
+    this.permissions = permissions != null ? new java.util.LinkedHashSet<>(permissions) : null;
   }
 }
 

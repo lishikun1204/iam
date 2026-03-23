@@ -1,5 +1,6 @@
 package com.iam.server.config;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class IamProperties {
      *
      * @return 返回Security配置实例，包含issuer和cors等子配置
      */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "ConfigurationProperties binding requires nested object exposure")
     public Security getSecurity() {
         return security;
     }
@@ -53,6 +55,7 @@ public class IamProperties {
          *
          * @return 返回Cors配置实例
          */
+        @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "ConfigurationProperties binding requires nested object exposure")
         public Cors getCors() {
             return cors;
         }
@@ -71,7 +74,7 @@ public class IamProperties {
              * @return 返回允许进行跨域请求的源地址列表
              */
             public List<String> getAllowedOrigins() {
-            return allowedOrigins;
+            return allowedOrigins != null ? List.copyOf(allowedOrigins) : List.of();
         }
 
             /**
@@ -80,7 +83,7 @@ public class IamProperties {
              * @param allowedOrigins 允许进行跨域请求的源地址列表
              */
             public void setAllowedOrigins(final List<String> allowedOrigins) {
-            this.allowedOrigins = allowedOrigins;
+            this.allowedOrigins = allowedOrigins != null ? new java.util.ArrayList<>(allowedOrigins) : null;
         }
     }
 }

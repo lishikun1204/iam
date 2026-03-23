@@ -8,11 +8,11 @@ public class SetRolePermissionsRequest {
   private Set<String> permissionIds;
 
   public Set<String> getPermissionIds() {
-    return permissionIds;
+    return permissionIds != null ? Set.copyOf(permissionIds) : Set.of();
   }
 
   public void setPermissionIds(final Set<String> permissionIds) {
-    this.permissionIds = permissionIds;
+    this.permissionIds = permissionIds != null ? new java.util.HashSet<>(permissionIds) : null;
   }
 }
 

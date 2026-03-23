@@ -1,22 +1,36 @@
-import { createApp } from 'vue'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import { createPinia } from 'pinia'
-import './style.css'
-import App from './App.vue'
-import router from './router'
-import { permissionDirective } from './directives/permission'
+import { createApp } from 'vue';
+import './plugins/assets';
+import { setupVueRootValidator } from 'vite-plugin-vue-transition-root-validator/client';
+import { setupAppVersionNotification, setupDayjs, setupIconifyOffline, setupLoading, setupNProgress } from './plugins';
+import { setupStore } from './store';
+import { setupRouter } from './router';
+import { getLocale, setupI18n } from './locales';
+import App from './App.vue';
 
-// 创建Vue应用实例
-const app = createApp(App)
+async function setupApp() {
+  setupLoading();
 
-app.use(createPinia())
-app.use(ElementPlus)
+  setupNProgress();
 
-// 使用路由
-app.use(router)
+  setupIconifyOffline();
 
-app.directive('permission', permissionDirective)
+  setupDayjs();
 
-// 挂载应用
-app.mount('#app')
+  const app = createApp(App);
+
+  setupStore(app);
+
+  await setupRouter(app);
+
+  setupI18n(app);
+
+  setupAppVersionNotification();
+
+  setupVueRootValidator(app, {
+    lang: getLocale() === 'zh-CN' ? 'zh' : 'en'
+  });
+
+  app.mount('#app');
+}
+
+setupApp();

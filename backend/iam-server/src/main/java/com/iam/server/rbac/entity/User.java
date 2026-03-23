@@ -112,11 +112,11 @@ public class User extends BaseEntity {
   }
 
   public Set<Role> getRoles() {
-    return roles;
+    return roles != null ? Set.copyOf(roles) : Set.of();
   }
 
   public void setRoles(final Set<Role> roles) {
-    this.roles = roles;
+    this.roles = roles != null ? new java.util.LinkedHashSet<>(roles) : null;
   }
 }
 

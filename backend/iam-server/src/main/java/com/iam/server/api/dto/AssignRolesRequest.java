@@ -8,11 +8,11 @@ public class AssignRolesRequest {
   private Set<String> roleIds;
 
   public Set<String> getRoleIds() {
-    return roleIds;
+    return roleIds != null ? Set.copyOf(roleIds) : Set.of();
   }
 
   public void setRoleIds(final Set<String> roleIds) {
-    this.roleIds = roleIds;
+    this.roleIds = roleIds != null ? new java.util.HashSet<>(roleIds) : null;
   }
 }
 

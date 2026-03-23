@@ -52,9 +52,11 @@ public class LoginPageController {
             banner +
             "<form class=\"iam-form\" method=\"post\" action=\"/login\">" +
             "<label class=\"iam-label\" for=\"username\">用户名</label>" +
-            "<input class=\"iam-input\" type=\"text\" id=\"username\" name=\"username\" placeholder=\"请输入用户名\" autocomplete=\"username\" required autofocus />" +
+            "<input class=\"iam-input\" type=\"text\" id=\"username\" name=\"username\" \n" +
+            "placeholder=\"请输入用户名\" autocomplete=\"username\" required autofocus />" +
             "<label class=\"iam-label\" for=\"password\">密码</label>" +
-            "<input class=\"iam-input\" type=\"password\" id=\"password\" name=\"password\" placeholder=\"请输入密码\" autocomplete=\"current-password\" required />" +
+            "<input class=\"iam-input\" type=\"password\" id=\"password\" name=\"password\" \n" +
+            "placeholder=\"请输入密码\" autocomplete=\"current-password\" required />" +
             csrfInput +
             "<button class=\"iam-button\" type=\"submit\">登录</button>" +
             "</form>" +
