@@ -46,7 +46,7 @@ export function createRouteGuard(router: Router) {
 
     // the route need login but the user is not logged in, then switch to the login page
     if (!isLogin) {
-      return { name: loginRoute, query: { redirect: to.fullPath } };
+      return { name: loginRoute, query: { redirect: to.fullPath, auto: '1' } };
     }
 
     // if the user is logged in but does not have authorization, then switch to the 403 page
@@ -178,6 +178,8 @@ function getRouteQueryOfLoginRoute(to: RouteLocationNormalized, routeHome: Route
   if (isRedirectHome && redirectQuery) {
     query.redirect = `/?${redirectQuery}`;
   }
+
+  query.auto = '1';
 
   return query;
 }

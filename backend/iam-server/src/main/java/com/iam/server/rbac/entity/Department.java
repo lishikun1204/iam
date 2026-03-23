@@ -73,4 +73,3 @@ public class Department extends BaseEntity {
     this.phone = phone;
   }
 }
-

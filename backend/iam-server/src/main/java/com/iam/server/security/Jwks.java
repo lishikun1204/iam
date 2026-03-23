@@ -13,7 +13,7 @@ public final class Jwks {
   private Jwks() {
   }
 
-    /**
+  /**
    * 生成一个用于JWT签名的RSA密钥对。
    *
    * @return 包含2048位长度的公钥和私钥的KeyPair对象
@@ -30,7 +30,7 @@ public final class Jwks {
     return keyPairGenerator.generateKeyPair();
   }
 
-    /**
+  /**
    * 生成一个包含RSA公钥和私钥的JWK Set (JSON Web Key Set)。
    * 该方法首先生成一个新的RSA密钥对，然后将其封装为符合RFC 7517标准的JWK对象，并为其分配一个唯一的ID。
    *
@@ -48,4 +48,3 @@ public final class Jwks {
     return new JWKSet(rsaKey);
   }
 }
-

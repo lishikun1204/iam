@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 public class RedisJtiJwtValidator implements OAuth2TokenValidator<Jwt> {
   private final TokenRevocationService revocationService;
 
-    /**
+  /**
    * 构造函数，用于注入令牌撤销服务。
    *
    * @param revocationService 提供查询令牌是否被撤销功能的服务
@@ -23,7 +23,7 @@ public class RedisJtiJwtValidator implements OAuth2TokenValidator<Jwt> {
     this.revocationService = revocationService;
   }
 
-    /**
+  /**
    * 验证给定的JWT令牌是否有效（未被撤销）。
    * 此方法从令牌中提取JWT ID (JTI)，并检查其是否存在于已撤销列表中。
    *
@@ -40,4 +40,3 @@ public class RedisJtiJwtValidator implements OAuth2TokenValidator<Jwt> {
     return OAuth2TokenValidatorResult.success();
   }
 }
-

@@ -17,13 +17,14 @@ import java.util.List;
 public class CorsConfig {
   @Bean
   @Primary
-      /*
-      创建并配置CORS配置源
-
-      @param properties 应用程序配置属性，包含安全相关的设置，特别是CORS允许的源列表
-     * @return 配置好的CORS资源配置源，适用于所有请求路径(/**)
-     */
-    public CorsConfigurationSource corsConfigurationSource(final IamProperties properties) {
+  /*
+   * 创建并配置CORS配置源
+   * 
+   * @param properties 应用程序配置属性，包含安全相关的设置，特别是CORS允许的源列表
+   * 
+   * @return 配置好的CORS资源配置源，适用于所有请求路径(/**)
+   */
+  public CorsConfigurationSource corsConfigurationSource(final IamProperties properties) {
     CorsConfiguration configuration = new CorsConfiguration();
     // 设置允许的源列表，从应用配置中读取
     configuration.setAllowedOrigins(List.copyOf(properties.getSecurity().getCors().getAllowedOrigins()));
@@ -37,4 +38,3 @@ public class CorsConfig {
     return source;
   }
 }
-

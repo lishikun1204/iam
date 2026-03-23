@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/store/modules/auth';
 import { $t } from '@/locales';
 
@@ -7,10 +9,16 @@ defineOptions({
 });
 
 const authStore = useAuthStore();
+const route = useRoute();
 
 async function handleSubmit() {
   await authStore.startOAuthLogin(true);
 }
+
+onMounted(async () => {
+  if (route.query.auto !== '1') return;
+  await handleSubmit();
+});
 </script>
 
 <template>

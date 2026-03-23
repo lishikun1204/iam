@@ -2,6 +2,7 @@ import type { RouteRecordRaw } from 'vue-router';
 import type { CustomRoute } from '@elegant-router/types';
 import { layouts, views } from '../elegant/imports';
 import { getRoutePath } from '../elegant/transform';
+import { localStg } from '@/utils/storage';
 
 export const ROOT_ROUTE: CustomRoute = {
   name: 'root',
@@ -31,7 +32,13 @@ export function createBuiltinVueRoutes() {
   const root: RouteRecordRaw = {
     name: 'root',
     path: '/',
-    redirect: getRoutePath(import.meta.env.VITE_ROUTE_HOME) || '/home',
+    redirect: () => {
+      const isLogin = Boolean(localStg.get('token'));
+      if (!isLogin) {
+        return '/login?auto=1';
+      }
+      return getRoutePath(import.meta.env.VITE_ROUTE_HOME) || '/home';
+    },
     meta: {
       title: 'root',
       constant: true

@@ -7,4 +7,3 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(IamProperties.class)
 public class AppConfig {
 }
-
