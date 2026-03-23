@@ -77,7 +77,7 @@ export const generatedRoutes: GeneratedRoute[] = [
   },
   {
     name: 'oauth-callback',
-    path: '/oauth-callback',
+    path: '/oauth/callback',
     component: 'layout.base$view.oauth-callback',
     meta: {
       title: 'oauth-callback',

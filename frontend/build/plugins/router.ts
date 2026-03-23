@@ -19,6 +19,10 @@ export function setupElegantRouter() {
         return `/login/:module(${moduleReg})?`;
       }
 
+      if (key === 'oauth-callback') {
+        return '/oauth/callback';
+      }
+
       return routePath;
     },
     onRouteMetaGen(routeName) {

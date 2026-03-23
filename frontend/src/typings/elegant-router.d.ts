@@ -23,7 +23,7 @@ declare module "@elegant-router/types" {
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
     "login": "/login/:module(pwd-login|code-login|register|reset-pwd|bind-wechat)?";
-    "oauth-callback": "/oauth-callback";
+    "oauth-callback": "/oauth/callback";
     "rbac": "/rbac";
     "rbac_depts": "/rbac/depts";
     "rbac_permissions": "/rbac/permissions";
