@@ -102,6 +102,7 @@ function transformElegantRouteToVueRoute(
           path,
           component: layouts[layout],
           meta: {
+            ...(route.meta ?? {}),
             title: route.meta?.title || ''
           },
           children: [
