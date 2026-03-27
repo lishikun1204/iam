@@ -19,7 +19,7 @@ import java.util.UUID;
  */
 @Component
 public class TraceIdFilter extends OncePerRequestFilter {
-  public static final String HEADER = "X-Trace-Id";
+    public static final String HEADER = "X-Trace-Id";
 
     @Override
   /*
@@ -32,20 +32,20 @@ public class TraceIdFilter extends OncePerRequestFilter {
    * @throws ServletException 如果处理过程中发生servlet错误
    * @throws IOException 如果处理过程中发生IO错误
    */
-  protected void doFilterInternal(final HttpServletRequest request,
-                                  final HttpServletResponse response,
-                                  final FilterChain filterChain) throws ServletException, IOException {
-    String traceId = request.getHeader(HEADER);
-    if (traceId == null || traceId.isBlank()) {
-      traceId = UUID.randomUUID().toString();
+    protected void doFilterInternal(final HttpServletRequest request,
+                                    final HttpServletResponse response,
+                                    final FilterChain filterChain) throws ServletException, IOException {
+        String traceId = request.getHeader(HEADER);
+        if (traceId == null || traceId.isBlank()) {
+            traceId = UUID.randomUUID().toString();
+        }
+        MDC.put("traceId", traceId);
+        response.setHeader(HEADER, traceId);
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            MDC.remove("traceId");
+        }
     }
-    MDC.put("traceId", traceId);
-    response.setHeader(HEADER, traceId);
-    try {
-      filterChain.doFilter(request, response);
-    } finally {
-      MDC.remove("traceId");
-    }
-  }
 }
 

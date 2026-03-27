@@ -20,6 +20,7 @@
     <spring-authorization-server.version>1.4.2</spring-authorization-server.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
   <dependencyManagement>
@@ -115,7 +116,6 @@
           <version>3.6.0</version>
           <configuration>
             <configLocation>config/checkstyle/checkstyle.xml</configLocation>
-            <encoding>UTF-8</encoding>
             <consoleOutput>true</consoleOutput>
             <failsOnError>true</failsOnError>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>

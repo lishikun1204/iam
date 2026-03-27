@@ -10,9 +10,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
-/**
- * CORS配置类，用于定义跨域资源共享策略
- * 通过注入IamProperties获取允许的源列表，并配置相关CORS规则
+/*
+  CORS配置类，用于定义跨域资源共享策略
+  通过注入IamProperties获取允许的源列表，并配置相关CORS规则
  */
 public class CorsConfig {
   @Bean

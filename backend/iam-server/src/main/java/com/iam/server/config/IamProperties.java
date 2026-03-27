@@ -61,29 +61,29 @@ public class IamProperties {
         }
     }
 
-        /**
-         * CORS跨域资源共享配置内部类
-         * 定义了允许的源列表(allowedOrigins)
-         */
-        public static class Cors {
+    /**
+     * CORS跨域资源共享配置内部类
+     * 定义了允许的源列表(allowedOrigins)
+     */
+    public static class Cors {
         private List<String> allowedOrigins = new ArrayList<>();
 
-            /**
-             * 获取允许的源列表
-             *
-             * @return 返回允许进行跨域请求的源地址列表
-             */
-            public List<String> getAllowedOrigins() {
+        /**
+         * 获取允许的源列表
+         *
+         * @return 返回允许进行跨域请求的源地址列表
+         */
+        public List<String> getAllowedOrigins() {
             return allowedOrigins != null ? List.copyOf(allowedOrigins) : List.of();
         }
 
-            /**
-             * 设置允许的源列表
-             *
-             * @param allowedOrigins 允许进行跨域请求的源地址列表
-             */
-            public void setAllowedOrigins(final List<String> allowedOrigins) {
-            this.allowedOrigins = allowedOrigins != null ? new java.util.ArrayList<>(allowedOrigins) : null;
+        /**
+         * 设置允许的源列表
+         *
+         * @param allowedOrigins 允许进行跨域请求的源地址列表
+         */
+        public void setAllowedOrigins(final List<String> allowedOrigins) {
+            this.allowedOrigins = allowedOrigins != null ? new ArrayList<>(allowedOrigins) : null;
         }
     }
 }
