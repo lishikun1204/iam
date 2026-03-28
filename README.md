@@ -40,6 +40,9 @@ pnpm dev
 - 前端点击“登录”会跳转到后端 `/oauth2/authorize`
 - 首次会进入后端表单登录页，登录成功后回跳前端 `/oauth/callback`
 - 前端使用 PKCE 交换 token，拿到 `access_token` 后调用 `/api/me` 拉取权限并生成动态路由
+- 前端“退出登录”会调用后端 `/api/auth/logout`，服务端撤销当前 token 并清理授权记录
+- 参考时序图：`docs/OAuth2.1授权码PKCE时序图.md`
+- JWK 配置（避免重启导致历史 token 失效）：`docs/JWK密钥配置.md`
 
 ## 代码质量
 后端：

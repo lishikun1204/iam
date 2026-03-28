@@ -5,6 +5,10 @@ export function fetchGetUserInfo() {
   return request<{ username: string; authorities: string[] }>({ url: '/api/me' });
 }
 
+export function fetchLogout() {
+  return request<{ loggedOut: boolean }>({ url: '/api/auth/logout', method: 'post' });
+}
+
 export async function fetchRefreshToken(refreshToken: string) {
   try {
     const data = await refreshAccessToken(refreshToken);

@@ -11,6 +11,8 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -45,7 +47,11 @@ import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.sql.DataSource;
+import java.io.InputStream;
+import java.security.Key;
 import java.security.KeyPair;
+import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
@@ -108,8 +114,32 @@ public class SecurityConfig {
      * @return 包含公钥和私钥的KeyPair对象
      */
     @Bean
-    public KeyPair keyPair() {
-        return Jwks.generateRsaKeyPair();
+    public KeyPair keyPair(final IamProperties properties, final ResourceLoader resourceLoader) {
+        String location = properties.getSecurity().getJwk().getKeyStoreLocation();
+        if (location == null || location.isBlank()) {
+            return Jwks.generateRsaKeyPair();
+        }
+
+        String storePassword = properties.getSecurity().getJwk().getKeyStorePassword();
+        String alias = properties.getSecurity().getJwk().getKeyAlias();
+        String keyPassword = properties.getSecurity().getJwk().getKeyPassword();
+
+        if (storePassword == null || storePassword.isBlank()) {
+            throw new IllegalStateException("iam.security.jwk.key-store-password is required");
+        }
+        if (alias == null || alias.isBlank()) {
+            throw new IllegalStateException("iam.security.jwk.key-alias is required");
+        }
+        if (keyPassword == null || keyPassword.isBlank()) {
+            keyPassword = storePassword;
+        }
+
+        Resource resource = resourceLoader.getResource(location);
+        try {
+            return loadKeyPair(resource, storePassword.toCharArray(), alias, keyPassword.toCharArray());
+        } catch (Exception ex) {
+            throw new IllegalStateException("Failed to load keypair from keystore: " + location, ex);
+        }
     }
 
     /**
@@ -120,14 +150,50 @@ public class SecurityConfig {
      * @return JWKSource实例，包含应用的公钥
      */
     @Bean
-    public JWKSource<SecurityContext> jwkSource(final KeyPair keyPair) {
+    public JWKSource<SecurityContext> jwkSource(final KeyPair keyPair, final IamProperties properties) {
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+        String kid = properties.getSecurity().getJwk().getKeyId();
+        if (kid == null || kid.isBlank()) {
+            kid = properties.getSecurity().getJwk().getKeyAlias();
+        }
+        if (kid == null || kid.isBlank()) {
+            kid = UUID.randomUUID().toString();
+        }
         RSAKey rsaKey = new RSAKey.Builder(publicKey)
                 .privateKey(privateKey)
-                .keyID(UUID.randomUUID().toString())
+                .keyID(kid)
                 .build();
         return new ImmutableJWKSet<>(new JWKSet(rsaKey));
+    }
+
+    private static KeyPair loadKeyPair(
+            final Resource resource,
+            final char[] storePassword,
+            final String alias,
+            final char[] keyPassword) throws Exception {
+        Exception last = null;
+        String[] types = new String[]{"PKCS12", "JKS", KeyStore.getDefaultType()};
+        for (String type : types) {
+            try {
+                KeyStore keyStore = KeyStore.getInstance(type);
+                try (InputStream is = resource.getInputStream()) {
+                    keyStore.load(is, storePassword);
+                }
+                Key key = keyStore.getKey(alias, keyPassword);
+                if (!(key instanceof PrivateKey privateKey)) {
+                    throw new IllegalStateException("No private key for alias: " + alias);
+                }
+                java.security.cert.Certificate cert = keyStore.getCertificate(alias);
+                if (cert == null) {
+                    throw new IllegalStateException("No certificate for alias: " + alias);
+                }
+                return new KeyPair(cert.getPublicKey(), privateKey);
+            } catch (Exception ex) {
+                last = ex;
+            }
+        }
+        throw last != null ? last : new IllegalStateException("Failed to load keystore");
     }
 
     /**
@@ -283,9 +349,7 @@ public class SecurityConfig {
     public DaoAuthenticationProvider authenticationProvider(
             final UserAuthService userAuthService,
             final PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider
-                (
-                        userAuthService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userAuthService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }

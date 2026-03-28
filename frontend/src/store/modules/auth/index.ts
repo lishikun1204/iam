@@ -2,7 +2,7 @@ import { computed, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { defineStore } from 'pinia';
 import { useLoading } from '@sa/hooks';
-import { fetchGetUserInfo } from '@/service/api';
+import { fetchGetUserInfo, fetchLogout } from '@/service/api';
 import { clearOAuthTempStorage, exchangeAuthorizationCode, getSavedOAuthRedirect, startPkceAuthorization } from '@/service/oauth';
 import { useRouterPush } from '@/hooks/common/router';
 import { localStg } from '@/utils/storage';
@@ -53,6 +53,11 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
 
     tabStore.cacheTabs();
     routeStore.resetStore();
+  }
+
+  async function logout() {
+    await fetchLogout();
+    await resetStore(true);
   }
 
   /** Record the user ID of the previous login session Used to compare with the current user ID on next login */
@@ -200,6 +205,7 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
     isLogin,
     loginLoading,
     resetStore,
+    logout,
     login,
     startOAuthLogin,
     handleOAuthCallback,

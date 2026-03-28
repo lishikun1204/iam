@@ -31,6 +31,7 @@ public class IamProperties {
     public static class Security {
         private String issuer;
         private final Cors cors = new Cors();
+        private final Jwk jwk = new Jwk();
 
         /**
          * 获取JWT令牌的签发者(issuer)
@@ -58,6 +59,59 @@ public class IamProperties {
         @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "ConfigurationProperties binding requires nested object exposure")
         public Cors getCors() {
             return cors;
+        }
+
+        @SuppressFBWarnings(value = "EI_EXPOSE_REP", justification = "ConfigurationProperties binding requires nested object exposure")
+        public Jwk getJwk() {
+            return jwk;
+        }
+    }
+
+    public static class Jwk {
+        private String keyStoreLocation;
+        private String keyStorePassword;
+        private String keyAlias;
+        private String keyPassword;
+        private String keyId;
+
+        public String getKeyStoreLocation() {
+            return keyStoreLocation;
+        }
+
+        public void setKeyStoreLocation(final String keyStoreLocation) {
+            this.keyStoreLocation = keyStoreLocation;
+        }
+
+        public String getKeyStorePassword() {
+            return keyStorePassword;
+        }
+
+        public void setKeyStorePassword(final String keyStorePassword) {
+            this.keyStorePassword = keyStorePassword;
+        }
+
+        public String getKeyAlias() {
+            return keyAlias;
+        }
+
+        public void setKeyAlias(final String keyAlias) {
+            this.keyAlias = keyAlias;
+        }
+
+        public String getKeyPassword() {
+            return keyPassword;
+        }
+
+        public void setKeyPassword(final String keyPassword) {
+            this.keyPassword = keyPassword;
+        }
+
+        public String getKeyId() {
+            return keyId;
+        }
+
+        public void setKeyId(final String keyId) {
+            this.keyId = keyId;
         }
     }
 

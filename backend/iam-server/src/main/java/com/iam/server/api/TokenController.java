@@ -9,6 +9,9 @@ import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,10 +22,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class TokenController {
   private final JwtDecoder jwtDecoder;
   private final TokenRevocationService tokenRevocationService;
+  private final OAuth2AuthorizationService authorizationService;
 
-  public TokenController(final JwtDecoder jwtDecoder, final TokenRevocationService tokenRevocationService) {
+  public TokenController(
+      final JwtDecoder jwtDecoder,
+      final TokenRevocationService tokenRevocationService,
+      final OAuth2AuthorizationService authorizationService) {
     this.jwtDecoder = jwtDecoder;
     this.tokenRevocationService = tokenRevocationService;
+    this.authorizationService = authorizationService;
   }
 
   @PostMapping("/revoke")
@@ -39,6 +47,11 @@ public class TokenController {
       throw new ApiException(ApiErrorCode.VALIDATION_ERROR, "access_token 缺少 exp");
     }
     tokenRevocationService.revokeJti(jwt.getId(), exp);
+    OAuth2Authorization authorization =
+        authorizationService.findByToken(req.getAccessToken(), OAuth2TokenType.ACCESS_TOKEN);
+    if (authorization != null) {
+      authorizationService.remove(authorization);
+    }
     return Map.of("revoked", true);
   }
 
