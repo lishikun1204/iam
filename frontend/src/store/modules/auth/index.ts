@@ -3,7 +3,13 @@ import { useRoute } from 'vue-router';
 import { defineStore } from 'pinia';
 import { useLoading } from '@sa/hooks';
 import { fetchGetUserInfo, fetchLogout } from '@/service/api';
-import { clearOAuthTempStorage, exchangeAuthorizationCode, getSavedOAuthRedirect, startPkceAuthorization } from '@/service/oauth';
+import {
+  clearOAuthTempStorage,
+  exchangeAuthorizationCode,
+  getSavedOAuthRedirect,
+  passwordLogin,
+  startPkceAuthorization
+} from '@/service/oauth';
 import { useRouterPush } from '@/hooks/common/router';
 import { localStg } from '@/utils/storage';
 import { SetupStoreId } from '@/enum';
@@ -104,8 +110,32 @@ export const useAuthStore = defineStore(SetupStoreId.Auth, () => {
    */
   async function login(userName: string, password: string, redirect = true) {
     startLoading();
-    await startOAuthLogin(redirect);
-    endLoading();
+    try {
+      const tokenResp = await passwordLogin(userName, password);
+      const loginToken: Api.Auth.LoginToken = {
+        token: tokenResp.access_token,
+        refreshToken: tokenResp.refresh_token || ''
+      };
+
+      const pass = await loginByToken(loginToken);
+      if (!pass) {
+        await resetStore(true);
+        return;
+      }
+
+      const isClear = checkTabClear();
+      await redirectFromLogin(!isClear && redirect);
+
+      window.$notification?.success({
+        title: $t('page.login.common.loginSuccess'),
+        content: $t('page.login.common.welcomeBack', { userName: userInfo.userName }),
+        duration: 4500
+      });
+    } catch {
+      await resetStore(true);
+    } finally {
+      endLoading();
+    }
   }
 
   async function startOAuthLogin(redirect = true) {

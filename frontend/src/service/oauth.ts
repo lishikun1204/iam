@@ -5,6 +5,12 @@ export const OAUTH_PKCE_VERIFIER_KEY = 'oauth_pkce_verifier';
 export const OAUTH_STATE_KEY = 'oauth_state';
 export const OAUTH_REDIRECT_KEY = 'oauth_redirect';
 
+function getAuthBase() {
+  const fromAuth = ((import.meta.env.VITE_AUTH_BASE_URL as string) || (import.meta.env.VITE_AUTH_BASE as string) || '').trim();
+  if (fromAuth) return fromAuth;
+  return ((import.meta.env.VITE_SERVICE_BASE_URL as string) || '').trim();
+}
+
 function getRedirectUri() {
   const configured = (import.meta.env.VITE_OAUTH_REDIRECT_URI as string) || '';
   if (configured) return configured;
@@ -12,7 +18,7 @@ function getRedirectUri() {
 }
 
 function getTokenEndpoint() {
-  const authBase = import.meta.env.VITE_AUTH_BASE_URL as string;
+  const authBase = getAuthBase();
   const isProxy = import.meta.env.DEV && import.meta.env.VITE_HTTP_PROXY === 'Y';
   return isProxy ? '/proxy-default/oauth2/token' : `${authBase}/oauth2/token`;
 }
@@ -38,7 +44,7 @@ async function sha256Base64Url(input: string) {
 }
 
 export async function startPkceAuthorization(options?: { redirect?: string }) {
-  const authBase = import.meta.env.VITE_AUTH_BASE_URL as string;
+  const authBase = getAuthBase();
   const clientId = import.meta.env.VITE_OAUTH_CLIENT_ID as string;
   const scope = (import.meta.env.VITE_OAUTH_SCOPE as string) || 'openid profile';
 
@@ -66,7 +72,7 @@ export async function startPkceAuthorization(options?: { redirect?: string }) {
 }
 
 export async function exchangeAuthorizationCode(code: string, state: string) {
-  const authBase = import.meta.env.VITE_AUTH_BASE_URL as string;
+  const authBase = getAuthBase();
   const clientId = import.meta.env.VITE_OAUTH_CLIENT_ID as string;
 
   const savedState = sessionStg.get(OAUTH_STATE_KEY) || '';
@@ -108,6 +114,33 @@ export async function refreshAccessToken(refreshToken: string) {
     grant_type: 'refresh_token',
     client_id: clientId,
     refresh_token: refreshToken
+  });
+
+  const { data } = await axios.post(getTokenEndpoint(), body, {
+    timeout: 10_000,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  });
+
+  return data as {
+    access_token: string;
+    refresh_token?: string;
+    token_type: string;
+    expires_in?: number;
+    scope?: string;
+    id_token?: string;
+  };
+}
+
+export async function passwordLogin(username: string, password: string) {
+  const clientId = import.meta.env.VITE_OAUTH_CLIENT_ID as string;
+  const scope = (import.meta.env.VITE_OAUTH_SCOPE as string) || 'openid profile';
+
+  const body = new URLSearchParams({
+    grant_type: 'password',
+    client_id: clientId,
+    username,
+    password,
+    scope
   });
 
   const { data } = await axios.post(getTokenEndpoint(), body, {

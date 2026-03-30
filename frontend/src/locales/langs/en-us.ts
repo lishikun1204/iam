@@ -327,7 +327,7 @@ const local: App.I18n.Schema = {
     },
     pwd: {
       required: 'Please enter password',
-      invalid: '6-18 characters, including letters, numbers, and underscores'
+      invalid: '6-18 characters, must include letters and numbers, symbols allowed'
     },
     confirmPwd: {
       required: 'Please enter password again',

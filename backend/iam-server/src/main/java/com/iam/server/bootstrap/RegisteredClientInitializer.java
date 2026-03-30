@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile({ "dev", "dev-noredis", "test" })
 public class RegisteredClientInitializer implements CommandLineRunner {
+  private static final AuthorizationGrantType PASSWORD_GRANT_TYPE = new AuthorizationGrantType("password");
   private final RegisteredClientRepository registeredClientRepository;
   private final TokenSettings tokenSettings;
   private final ClientSettings clientSettings;
@@ -73,6 +74,7 @@ public class RegisteredClientInitializer implements CommandLineRunner {
         .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
         .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+        .authorizationGrantType(PASSWORD_GRANT_TYPE)
         .scope(OidcScopes.OPENID)
         .scope(OidcScopes.PROFILE)
         .scope("rbac")

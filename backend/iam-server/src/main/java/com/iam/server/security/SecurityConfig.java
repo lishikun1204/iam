@@ -3,11 +3,15 @@ package com.iam.server.security;
 import com.iam.server.config.IamProperties;
 import com.iam.server.rbac.service.RbacQueryService;
 import com.iam.server.rbac.service.UserAuthService;
+import com.iam.server.security.password.OAuth2PasswordAuthenticationConverter;
+import com.iam.server.security.password.OAuth2PasswordAuthenticationProvider;
+import com.iam.server.security.password.PasswordPublicClientAuthenticationConverter;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -23,9 +27,21 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AuthorizationCodeAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2ClientCredentialsAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2RefreshTokenAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.ClientSecretBasicAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.ClientSecretPostAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.JwtClientAssertionAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.PublicClientAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.X509ClientCertificateAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
@@ -38,7 +54,12 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.JwtGenerator;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2AccessTokenGenerator;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2RefreshTokenGenerator;
+import org.springframework.security.oauth2.server.authorization.token.DelegatingOAuth2TokenGenerator;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -195,7 +216,7 @@ public class SecurityConfig {
         }
         throw last != null ? last : new IllegalStateException("Failed to load keystore");
     }
-
+  
     /**
      * 创建一个JwtDecoder Bean，用于解码和验证JWT令牌。
      * 配置了默认的JWT校验器，并额外添加了基于Redis的JTI撤销校验器，以确保已撤销的令牌无法通过验证。
@@ -236,6 +257,22 @@ public class SecurityConfig {
             context.getClaims().claim("authorities", rbacQueryService.getAuthorityCodesByUsername(username));
             context.getClaims().claim("username", username);
         };
+    }
+
+    @Bean
+    public JwtEncoder jwtEncoder(final JWKSource<SecurityContext> jwkSource) {
+        return new NimbusJwtEncoder(jwkSource);
+    }
+
+    @Bean
+    public OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator(
+            final JwtEncoder jwtEncoder,
+            final OAuth2TokenCustomizer<JwtEncodingContext> jwtCustomizer) {
+        JwtGenerator jwtGenerator = new JwtGenerator(jwtEncoder);
+        jwtGenerator.setJwtCustomizer(jwtCustomizer);
+        OAuth2AccessTokenGenerator accessTokenGenerator = new OAuth2AccessTokenGenerator();
+        OAuth2RefreshTokenGenerator refreshTokenGenerator = new OAuth2RefreshTokenGenerator();
+        return new DelegatingOAuth2TokenGenerator(jwtGenerator, accessTokenGenerator, refreshTokenGenerator);
     }
 
     /**
@@ -291,14 +328,41 @@ public class SecurityConfig {
      */
     @Bean
     @Order(1)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(final HttpSecurity http,
-                                                                      final CorsConfigurationSource cors) throws Exception {
+    public SecurityFilterChain authorizationServerSecurityFilterChain(
+            final HttpSecurity http,
+            final CorsConfigurationSource cors,
+            final OAuth2AuthorizationService authorizationService,
+            final OAuth2TokenGenerator<?> tokenGenerator,
+            final DaoAuthenticationProvider authenticationProvider) throws Exception {
         // 应用Spring Authorization Server的默认安全配置
         // 注意：此方法已过时，但为保持与当前版本的兼容性而保留
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         // 启用OpenID Connect 1.0支持
-        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                .oidc(Customizer.withDefaults());
+        OAuth2AuthorizationServerConfigurer authorizationServerConfigurer =
+                http.getConfigurer(OAuth2AuthorizationServerConfigurer.class);
+        authorizationServerConfigurer
+                .oidc(Customizer.withDefaults())
+                .clientAuthentication(clientAuthentication -> clientAuthentication
+                        .authenticationConverter(new DelegatingAuthenticationConverter(List.of(
+                                new ClientSecretBasicAuthenticationConverter(),
+                                new ClientSecretPostAuthenticationConverter(),
+                                new JwtClientAssertionAuthenticationConverter(),
+                                new X509ClientCertificateAuthenticationConverter(),
+                                new PublicClientAuthenticationConverter(),
+                                new PasswordPublicClientAuthenticationConverter()
+                        ))))
+                .tokenEndpoint(tokenEndpoint -> tokenEndpoint
+                        .accessTokenRequestConverter(new DelegatingAuthenticationConverter(List.of(
+                                new OAuth2AuthorizationCodeAuthenticationConverter(),
+                                new OAuth2RefreshTokenAuthenticationConverter(),
+                                new OAuth2ClientCredentialsAuthenticationConverter(),
+                                new OAuth2PasswordAuthenticationConverter()
+                        )))
+                        .authenticationProvider(new OAuth2PasswordAuthenticationProvider(
+                                authorizationService,
+                                tokenGenerator,
+                                authenticationProvider
+                        )));
         // 配置跨域资源共享(CORS)，使用全局的CorsConfigurationSource
         http.cors(c -> c.configurationSource(cors));
         // 为特定的OAuth2端点禁用CSRF保护，因为这些端点通常由机器对机器调用

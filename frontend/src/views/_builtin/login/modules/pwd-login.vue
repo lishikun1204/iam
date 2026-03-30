@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, reactive } from 'vue';
+import { useRouterPush } from '@/hooks/common/router';
+import { useFormRules, useNaiveForm } from '@/hooks/common/form';
 import { useAuthStore } from '@/store/modules/auth';
 import { $t } from '@/locales';
 
@@ -9,27 +10,59 @@ defineOptions({
 });
 
 const authStore = useAuthStore();
-const route = useRoute();
+const { toggleLoginModule } = useRouterPush();
+const { formRef, validate } = useNaiveForm();
 
-async function handleSubmit() {
-  await authStore.startOAuthLogin(true);
+interface FormModel {
+  userName: string;
+  password: string;
 }
 
-onMounted(async () => {
-  if (route.query.auto !== '1') return;
-  await handleSubmit();
+const model: FormModel = reactive({
+  userName: '',
+  password: ''
 });
+
+const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
+  const { formRules } = useFormRules();
+
+  return {
+    userName: formRules.userName,
+    password: formRules.pwd
+  };
+});
+
+async function handleSubmit() {
+  await validate();
+  await authStore.login(model.userName, model.password, true);
+}
 </script>
 
 <template>
-  <NSpace vertical :size="24">
-    <NText depth="3">
-      {{ $t('page.login.pwdLogin.oauthTip') }}
-    </NText>
-    <NButton type="primary" size="large" round block :loading="authStore.loginLoading" @click="handleSubmit">
-      {{ $t('common.confirm') }}
-    </NButton>
-  </NSpace>
+  <NForm ref="formRef" :model="model" :rules="rules" size="large" :show-label="false" @keyup.enter="handleSubmit">
+    <NFormItem path="userName">
+      <NInput v-model:value="model.userName" :placeholder="$t('page.login.common.userNamePlaceholder')" />
+    </NFormItem>
+    <NFormItem path="password">
+      <NInput
+        v-model:value="model.password"
+        type="password"
+        show-password-on="click"
+        :placeholder="$t('page.login.common.passwordPlaceholder')"
+      />
+    </NFormItem>
+    <NSpace vertical :size="18" class="w-full">
+      <NButton type="primary" size="large" round block :loading="authStore.loginLoading" @click="handleSubmit">
+        {{ $t('common.confirm') }}
+      </NButton>
+      <NButton size="large" round block :loading="authStore.loginLoading" @click="authStore.startOAuthLogin(true)">
+        {{ $t('page.login.pwdLogin.oauthTip') }}
+      </NButton>
+      <NButton size="large" round block @click="toggleLoginModule('code-login')">
+        {{ $t('page.login.common.codeLogin') }}
+      </NButton>
+    </NSpace>
+  </NForm>
 </template>
 
 <style scoped></style>
